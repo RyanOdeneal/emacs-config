@@ -28,13 +28,49 @@
 (advice-add 'evil-previous-line :after 'org-update-fill-column-after-navigation)
 (advice-add 'evil-forward-char :after 'org-update-fill-column-after-navigation)
 
+;;  Org mode literal block boilerplate
+(defun literal-boilerplate ()
+  (interactive)
+  (let ((name (read-string "Enter block name: ")))
+    (insert "#+name: " name "\n")
+    (insert "#+begin\n")
+    (insert "\n")
+    (insert "\n")
+    (insert "\n")
+    (insert "#+end\n")
+    (forward-line -3)))
 
-;;  This was instructed for me to do here:
+(global-set-key (kbd "C-c b l") 'scheme-output-boilerplate)
+
+;;  This was instructed for me to originally do here:
 ;;  https://orgmode.org/worg/org-contrib/babel/languages/ob-doc-scheme.html
-;;  So that I can run scheme code with geiser in source code blocks in org mode.
+;;  So that I could run scheme code with geiser in my source code blocks in
+;;  org mode. Now it's for latex though.
 (org-babel-do-load-languages
  'org-babel-load-languages
- '((scheme . t)))
+ '((latex . t)))
+
+;;  This lets me use the dvisvgm package to convert dvi, a format that
+;;  latex spits out, and turn it into an svg.
+(setq org-preview-latex-default-process 'dvisvgm)
+
+;;  So I can resize images with #+ATTR_ORG: :width 100
+(setq org-image-actual-width nil)
+
+;;  Setting the org-roam directory
+(setq org-roam-directory (file-truename "~/Documents/zettelkasten"))
+
+;;  This does symbolic links for org-roam but has a performance cost.
+(setq find-file-visit-truename t)
+
+;; Ensuring org-roam is available on startup as described here:
+;; https://www.orgroam.com/manual.html#Getting-Started
+(org-roam-db-autosync-mode)
+
+;;  NOT CURRENTLY RELEVANT
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;  Scheme org mode source code block boilerplate
 (defun scheme-output-boilerplate ()
@@ -49,17 +85,3 @@
     (forward-line -3)))
 
 (global-set-key (kbd "C-c b s") 'scheme-output-boilerplate)
-
-;;  Scheme org mode literal block boilerplate
-(defun literal-boilerplate ()
-  (interactive)
-  (let ((name (read-string "Enter block name: ")))
-    (insert "#+name: " name "\n")
-    (insert "#+begin\n")
-    (insert "\n")
-    (insert "\n")
-    (insert "\n")
-    (insert "#+end\n")
-    (forward-line -3)))
-
-(global-set-key (kbd "C-c b l") 'scheme-output-boilerplate)
