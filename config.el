@@ -40,7 +40,7 @@
     (insert "#+end\n")
     (forward-line -3)))
 
-(global-set-key (kbd "C-c b l") 'scheme-output-boilerplate)
+(global-set-key (kbd "C-c b l") 'literal-boilerplate)
 
 ;;  This was instructed for me to originally do here:
 ;;  https://orgmode.org/worg/org-contrib/babel/languages/ob-doc-scheme.html
@@ -56,16 +56,6 @@
 
 ;;  So I can resize images with #+ATTR_ORG: :width 100
 (setq org-image-actual-width nil)
-
-;;  Setting the org-roam directory
-(setq org-roam-directory (file-truename "~/Documents/zettelkasten"))
-
-;;  This does symbolic links for org-roam but has a performance cost.
-(setq find-file-visit-truename t)
-
-;; Ensuring org-roam is available on startup as described here:
-;; https://www.orgroam.com/manual.html#Getting-Started
-(org-roam-db-autosync-mode)
 
 ;;  NOT CURRENTLY RELEVANT
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
