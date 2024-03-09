@@ -3,19 +3,24 @@
 (setq-default display-fill-column-indicator-column 80)
 (global-display-fill-column-indicator-mode)
 
-;;  Org specific column width setting. When opening a raw file, besides lines
-;;  with latex code, everything will obey an 80 column width restriction. Org
-;;  mode indents your lines visually however, and so this is here to offset that
-;;  visually in order to keep me from being constrained to something like 50
-;;  character on average.
+;;  Dynamic Org specific column width setting.
+;;
+;;  Org mode indents your lines visually (but not literally) under a header and
+;;  so this is here to offset that in order to keep me from being constrained
+;;  by the default 80 line character width to something like 50 characters on
+;;  average.
+;;
+;;  When opening a raw file, everything will obey an 80 column width
+;;  restriction.
 (defun set-fill-column-based-on-header ()
-  (when (eq major-mode 'org-mode)
-    (save-excursion
-      (beginning-of-line)
-      (let ((level (org-current-level)))
-        (setq-default display-fill-column-indicator-column
-                      (if level (+ 80 (* 2 level)) 80))))))
-
+  (if (eq major-mode 'org-mode)
+      (save-excursion
+        (beginning-of-line)
+        (let ((level (org-current-level)))
+          (setq-default display-fill-column-indicator-column
+                        (if level (+ 80 (* 2 level)) 80))))
+    ;; For any other major mode that isn't org-mode
+    (setq-default display-fill-column-indicator-column 80)))
 
 ;;  Update the fill column after navigation commands.
 (defun org-update-fill-column-after-navigation (&rest _)
@@ -27,51 +32,8 @@
 (advice-add 'evil-next-line :after 'org-update-fill-column-after-navigation)
 (advice-add 'evil-previous-line :after 'org-update-fill-column-after-navigation)
 (advice-add 'evil-forward-char :after 'org-update-fill-column-after-navigation)
+(advice-add 'evil-ret :after 'org-update-fill-column-after-navigation)
 
-;;  Org mode literal block boilerplate
-(defun literal-boilerplate ()
-  (interactive)
-  (let ((name (read-string "Enter block name: ")))
-    (insert "#+name: " name "\n")
-    (insert "#+begin\n")
-    (insert "\n")
-    (insert "\n")
-    (insert "\n")
-    (insert "#+end\n")
-    (forward-line -3)))
 
-(global-set-key (kbd "C-c b l") 'literal-boilerplate)
-
-;;  This was instructed for me to originally do here:
-;;  https://orgmode.org/worg/org-contrib/babel/languages/ob-doc-scheme.html
-;;  So that I could run scheme code with geiser in my source code blocks in
-;;  org mode. Now it's for latex though.
-(org-babel-do-load-languages
- 'org-babel-load-languages
- '((latex . t)))
-
-;;  This lets me use the dvisvgm package to convert dvi, a format that
-;;  latex spits out, and turn it into an svg.
-(setq org-preview-latex-default-process 'dvisvgm)
-
-;;  So I can resize images with #+ATTR_ORG: :width 100
-(setq org-image-actual-width nil)
-
-;;  NOT CURRENTLY RELEVANT
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;;  Scheme org mode source code block boilerplate
-(defun scheme-output-boilerplate ()
-  (interactive)
-  (let ((name (read-string "Enter block name: ")))
-    (insert "#+name: " name "\n")
-    (insert "#+begin_src scheme :results output :noweb yes\n")
-    (insert "\n")
-    (insert "\n")
-    (insert "\n")
-    (insert "#+end_src\n")
-    (forward-line -3)))
-
-(global-set-key (kbd "C-c b s") 'scheme-output-boilerplate)
+;; Keep the PDF's dark
+(add-hook 'pdf-tools-enabled-hook 'pdf-view-midnight-minor-mode)
